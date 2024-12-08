@@ -240,19 +240,19 @@ void EditorDebuggerInspector::add_stack_variable(const Array &p_array, int p_off
 	String type;
 	switch (var.type) {
 		case 0:
-			type = "Locals/";
+			type = "Locals@";
 			break;
 		case 1:
-			type = "Members/";
+			type = "Members@";
 			break;
 		case 2:
-			type = "Globals/";
+			type = "Globals@";
 			break;
 		case 3:
-			type = "Evaluated/";
+			type = "Evaluated@";
 			break;
 		default:
-			type = "Unknown/";
+			type = "Unknown@";
 	}
 
 	PropertyInfo pinfo;

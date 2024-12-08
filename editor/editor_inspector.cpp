@@ -60,7 +60,7 @@ bool EditorInspector::_property_path_matches(const String &p_property_path, cons
 		return true;
 	}
 
-	const Vector<String> prop_sections = p_property_path.split("/");
+	const Vector<String> prop_sections = p_property_path.split("@");
 	for (int i = 0; i < prop_sections.size(); i++) {
 		if (p_filter.is_subsequence_ofn(EditorPropertyNameProcessor::get_singleton()->process_name(prop_sections[i], p_style, p_property_path))) {
 			return true;
@@ -3137,7 +3137,7 @@ void EditorInspector::update_tree() {
 
 		if (!array_prefix.is_empty()) {
 			path = path.trim_prefix(array_prefix);
-			int char_index = path.find_char('/');
+			int char_index = path.find_char('@');
 			if (char_index >= 0) {
 				path = path.right(-char_index - 1);
 			} else {
@@ -3169,15 +3169,15 @@ void EditorInspector::update_tree() {
 
 			// Add the group and subgroup to the path.
 			if (!subgroup.is_empty()) {
-				path = subgroup + "/" + path;
+				path = subgroup + "@" + path;
 			}
 			if (!group.is_empty()) {
-				path = group + "/" + path;
+				path = group + "@" + path;
 			}
 		}
 
 		// Get the property label's string.
-		String name_override = (path.contains("/")) ? path.substr(path.rfind_char('/') + 1) : path;
+		String name_override = (path.contains("@")) ? path.substr(path.rfind_char('@') + 1) : path;
 		String feature_tag;
 		{
 			const int dot = name_override.find_char('.');
@@ -3195,7 +3195,7 @@ void EditorInspector::update_tree() {
 		const String property_label_string = EditorPropertyNameProcessor::get_singleton()->process_name(name_override, name_style, p.name, doc_name) + feature_tag;
 
 		// Remove the property from the path.
-		int idx = path.rfind_char('/');
+		int idx = path.rfind_char('@');
 		if (idx > -1) {
 			path = path.left(idx);
 		} else {
@@ -3204,7 +3204,7 @@ void EditorInspector::update_tree() {
 
 		// Ignore properties that do not fit the filter.
 		if (use_filter && !filter.is_empty()) {
-			const String property_path = property_prefix + (path.is_empty() ? "" : path + "/") + name_override;
+			const String property_path = property_prefix + (path.is_empty() ? "" : path + "@") + name_override;
 			if (!_property_path_matches(property_path, filter, property_name_style)) {
 				continue;
 			}
@@ -3232,10 +3232,10 @@ void EditorInspector::update_tree() {
 		String acc_path = "";
 		int level = 1;
 
-		Vector<String> components = path.split("/");
+		Vector<String> components = path.split("@");
 		for (int i = 0; i < components.size(); i++) {
 			const String &component = components[i];
-			acc_path += (i > 0) ? "/" + component : component;
+			acc_path += (i > 0) ? "@" + component : component;
 
 			if (!vbox_per_path[root_vbox].has(acc_path)) {
 				// If the section does not exists, create it.
@@ -3326,7 +3326,7 @@ void EditorInspector::update_tree() {
 				array_element_prefix = class_name_components[0];
 				editor_inspector_array = memnew(EditorInspectorArray(all_read_only));
 
-				String array_label = path.contains("/") ? path.substr(path.rfind_char('/') + 1) : path;
+				String array_label = path.contains("@") ? path.substr(path.rfind_char('@') + 1) : path;
 				array_label = EditorPropertyNameProcessor::get_singleton()->process_name(property_label_string, property_name_style, p.name, doc_name);
 				int page = per_array_page.has(array_element_prefix) ? per_array_page[array_element_prefix] : 0;
 				editor_inspector_array->setup_with_move_element_function(object, array_label, array_element_prefix, page, c, use_folding);
@@ -3419,7 +3419,7 @@ void EditorInspector::update_tree() {
 
 				HashMap<String, DocData::ClassDoc>::ConstIterator F = dd->class_list.find(classname);
 				while (F) {
-					Vector<String> slices = propname.operator String().split("/");
+					Vector<String> slices = propname.operator String().split("@");
 					// Check if it's a theme item first.
 					if (slices.size() == 2 && slices[0].begins_with("theme_override_")) {
 						for (int i = 0; i < F->value.theme_properties.size(); i++) {
